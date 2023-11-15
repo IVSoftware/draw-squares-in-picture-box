@@ -27,7 +27,6 @@ namespace draw_squares_in_picture_box
             {
                 if (MouseButtons == MouseButtons.Left)
                 {
-                    var delta = _mouseCurrentPoint.Y - _mouseDownPoint.Y;
                     using (var pen = new Pen(Color.DarkRed, 2F))
                     {
                         Debug.WriteLine($"{_mouseDownPoint}{_mouseCurrentPoint}");
