@@ -30,7 +30,7 @@ namespace draw_squares_in_picture_box
         /// </summary>
         private void InitializeComponent()
         {
-            pictureBox1 = new PictureBoxEx();
+            pictureBox1 = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -60,6 +60,6 @@ namespace draw_squares_in_picture_box
 
         #endregion
 
-        private PictureBoxEx pictureBox1;
+        private PictureBox pictureBox1;
     }
 }

@@ -7,35 +7,24 @@ namespace draw_squares_in_picture_box
         public MainForm()
         {
             InitializeComponent();
-        }
 
-        class PictureBoxEx : PictureBox
-        {
-            protected override void OnMouseDown(MouseEventArgs e)
-            {
-                base.OnMouseDown(e);
+            // Capture starting point.
+            pictureBox1.MouseDown += (sender, e) =>
                 _mouseDownPoint = e.Location;
-            }
-            Point _mouseDownPoint = default;
 
-            protected override void OnMouseMove(MouseEventArgs e)
+            // If Left button is down, tell the picture box to repaint itself.
+            pictureBox1.MouseMove += (sender, e) =>
             {
-                base.OnMouseMove(e);
-                _mouseCurrentPoint = e.Location;
-                if (MouseButtons == MouseButtons.Left)
+                if (e.Button == MouseButtons.Left)
                 {
-                    BeginInvoke((MethodInvoker)delegate { Invalidate(); });
+                    _mouseCurrentPoint = e.Location;
+                    pictureBox1.Invalidate();
                 }
-            }
-            Point _mouseCurrentPoint = default;
-            protected override void OnMouseUp(MouseEventArgs e)
+            };
+
+            // Use the Paint event to draw.
+            pictureBox1.Paint += (sender, e) =>
             {
-                base.OnMouseUp(e);
-                Squares.Add(_currentSquare);
-            }
-            protected override void OnPaint(PaintEventArgs e)
-            {
-                base.OnPaint(e);
                 if (MouseButtons == MouseButtons.Left)
                 {
                     var delta = _mouseCurrentPoint.Y - _mouseDownPoint.Y;
@@ -45,18 +34,27 @@ namespace draw_squares_in_picture_box
                         var width = _mouseCurrentPoint.X - _mouseDownPoint.X;
                         var height = _mouseCurrentPoint.Y - _mouseDownPoint.Y;
                         var side = Math.Max(width, height);
-                        _currentSquare = new Rectangle(_mouseDownPoint, new Size(side, side));
-                        e.Graphics.DrawRectangle(pen, _currentSquare);
 
-                        foreach (var square in Squares)
+                        // Draw rectangle ON THE GRAPHICS PROVIDED.
+                        _currentBounds = new Rectangle(_mouseDownPoint, new Size(side, side));
+                        e.Graphics.DrawRectangle(pen, _currentBounds);
+
+                        foreach (var savedRectangle in RectanglesToRedraw)
                         {
-                            e.Graphics.DrawRectangle(pen, square);
+                            e.Graphics.DrawRectangle(pen, savedRectangle);                           
                         }
                     }
                 }
-            }
-            Rectangle _currentSquare = default;
-            List<Rectangle> Squares { get; } = new List<Rectangle>();
+            };
+
+            // If you don't want this square to erase the next
+            // time you Invalidate, add it to your "Document".
+            pictureBox1.MouseUp += (sender, e) => 
+                RectanglesToRedraw.Add(_currentBounds);
         }
+        Point _mouseDownPoint = default;
+        Point _mouseCurrentPoint = default;
+        Rectangle _currentBounds = default;
+        List<Rectangle> RectanglesToRedraw { get; } = new List<Rectangle>();
     }
 }
